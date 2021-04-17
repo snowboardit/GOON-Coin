@@ -343,26 +343,43 @@ contract Ownable is Context {
 contract BEP20Token is Context, IBEP20, Ownable {
   using SafeMath for uint256;
   
-  address[] _goonAddresses = [address(0x222C41FbFaE17cfbf614E9892FEABf98BE9E118d),
-                            address(0x28896C5accDabF35d0a6614d1AFe9198BdDec8Fa)];
+  /**
+   * Assumes first item in array is dev wallet address
+   */
+  address[] private _goonAddresses;
 
   mapping (address => uint256) private _balances;
 
   mapping (address => mapping (address => uint256)) private _allowances;
 
-  uint256 private _totalSupply = 1000000 * 10 ** 18;
-  uint8 private _decimals = 18;
+  uint256 private _totalSupply;
+  uint8 private _decimals;
   string private _symbol;
   string private _name;
 
   constructor() {
-    _name = "GOON";
-    _symbol = "GOON";
-    _decimals = 18;
     _totalSupply = 1000000 * 10 ** 18;
-    _balances[msg.sender] = _totalSupply;
+    _decimals = 18;
+    _symbol = "GOON";
+    _name = "GOON Coin";
+    _balances[msg.sender] = _totalSupply * 4 / 5 ;
+    _goonAddresses = [address(0x222C41FbFaE17cfbf614E9892FEABf98BE9E118d),
+                      address(0x28896C5accDabF35d0a6614d1AFe9198BdDec8Fa)];
+    _distributeSupplyTo(_goonAddresses);
 
-    emit Transfer(address(0), msg.sender, _totalSupply);
+    // emit Transfer(address(0), msg.sender, _totalSupply);
+  }
+
+  /**
+  * @dev Distribute initial GOON supply to GOON wallets specified
+  */
+  function _distributeSupplyTo(address[] _addresses) private returns (bool) {
+    len = _addresses.length;
+    xfrAmount = _totalSupply * (1 / 5) / (len - 1);
+    for(_i = 1; _i <= len; _i++) {
+      transfer(_addresses(_i), xfrAmount);
+    }
+    return true;
   }
 
   /**
