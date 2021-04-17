@@ -340,13 +340,10 @@ contract Ownable is Context {
   }
 }
 
-contract BEP20Token is Context, IBEP20, Ownable {
+contract GOONCoin is Context, IBEP20, Ownable {
   using SafeMath for uint256;
-  
-  /**
-   * Assumes first item in array is dev wallet address
-   */
-  address[] private _goonAddresses;
+
+  address[] private _goonAddresses; //** Assumes first item in array is dev wallet address **//
 
   mapping (address => uint256) private _balances;
 
