@@ -371,10 +371,10 @@ contract GOONCoin is Context, IBEP20, Ownable {
   * @dev Distribute initial GOON supply to GOON wallets specified
   */
   function _distributeSupplyTo(address[] _addresses) private returns (bool) {
-    len = _addresses.length;
-    xfrAmount = _totalSupply * (1 / 5) / (len - 1);
-    for(_i = 1; _i <= len; _i++) {
-      transfer(_addresses(_i), xfrAmount);
+    uint8 len = _addresses.length;
+    uint16 txAmount = _totalSupply * (1 / 5) / (len - 1);
+    for(uint8 _i = 1; _i <= len; _i++) {
+      Transfer(_addresses(_i), txAmount);
     }
     return true;
   }
