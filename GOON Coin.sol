@@ -1,7 +1,7 @@
 /* 
 SPDX-License-Identifier: UNLICENSED
 */
-pragma solidity 0.8.0;
+pragma solidity 0.5.3;
 
 interface IBEP20 {
   /**
@@ -107,11 +107,10 @@ interface IBEP20 {
 contract Context {
   // Empty internal constructor, to prevent people from mistakenly deploying
   // an instance of this contract, which should be used via inheritance.
-  constructor () { }
+  constructor () internal { }
 
   function _msgSender() internal view returns (address payable) {
-    this;
-    return payable(msg.sender);
+    return msg.sender;
   }
 
   function _msgData() internal view returns (bytes memory) {
@@ -289,7 +288,7 @@ contract Ownable is Context {
   /**
    * @dev Initializes the contract setting the deployer as the initial owner.
    */
-  constructor () {
+  constructor () internal {
     address msgSender = _msgSender();
     _owner = msgSender;
     emit OwnershipTransferred(address(0), msgSender);
@@ -340,6 +339,14 @@ contract Ownable is Context {
   }
 }
 
+
+/*************
+*            *
+*  GOONCoin  *
+*            *
+**************/
+
+
 contract GOONCoin is Context, IBEP20, Ownable {
   using SafeMath for uint256;
 
@@ -354,70 +361,59 @@ contract GOONCoin is Context, IBEP20, Ownable {
   string private _symbol;
   string private _name;
 
-  constructor() {
-    _totalSupply = 1000000 * 10 ** 18;
+  constructor() public {
+    _totalSupply = 1000000000000000000000000; // One million and 18 decimals
     _decimals = 18;
     _symbol = "GOON";
     _name = "GOON Coin";
-    _balances[msg.sender] = _totalSupply * 4 / 5 ;
+    _balances[msg.sender] = _totalSupply;
     _goonAddresses = [address(0x222C41FbFaE17cfbf614E9892FEABf98BE9E118d),
                       address(0x28896C5accDabF35d0a6614d1AFe9198BdDec8Fa)];
+
+    emit Transfer(address(0), msg.sender, _totalSupply);
     _distributeSupplyTo(_goonAddresses);
 
-    // emit Transfer(address(0), msg.sender, _totalSupply);
-  }
-
-  /**
-  * @dev Distribute initial GOON supply to GOON wallets specified
-  */
-  function _distributeSupplyTo(address[] _addresses) private returns (bool) {
-    uint8 len = _addresses.length;
-    uint16 txAmount = _totalSupply * (1 / 5) / (len - 1);
-    for(uint8 _i = 1; _i <= len; _i++) {
-      Transfer(_addresses(_i), txAmount);
-    }
-    return true;
   }
 
   /**
    * @dev Returns the bep token owner.
    */
-  function getOwner() override external view returns (address) {
+  function getOwner() external view returns (address) {
     return owner();
   }
 
   /**
    * @dev Returns the token decimals.
    */
-  function decimals() override external view returns (uint8) {
+  function decimals() external view returns (uint8) {
     return _decimals;
   }
 
   /**
    * @dev Returns the token symbol.
    */
-  function symbol() override external view returns (string memory) {
+  function symbol() external view returns (string memory) {
     return _symbol;
   }
 
   /**
   * @dev Returns the token name.
   */
-  function name() override external view returns (string memory) {
+  function name() external view returns (string memory) {
     return _name;
   }
 
   /**
    * @dev See {BEP20-totalSupply}.
    */
-  function totalSupply() override external view returns (uint256) {
+  function totalSupply() external view returns (uint256) {
     return _totalSupply;
   }
 
   /**
    * @dev See {BEP20-balanceOf}.
    */
-  function balanceOf(address account) override external view returns (uint256) {
+  function balanceOf(address account) external view returns (uint256) {
     return _balances[account];
   }
 
@@ -429,7 +425,7 @@ contract GOONCoin is Context, IBEP20, Ownable {
    * - `recipient` cannot be the zero address.
    * - the caller must have a balance of at least `amount`.
    */
-  function transfer(address recipient, uint256 amount) override external returns (bool) {
+  function transfer(address recipient, uint256 amount) external returns (bool) {
     _transfer(_msgSender(), recipient, amount);
     return true;
   }
@@ -437,7 +433,7 @@ contract GOONCoin is Context, IBEP20, Ownable {
   /**
    * @dev See {BEP20-allowance}.
    */
-  function allowance(address owner, address spender) override external view returns (uint256) {
+  function allowance(address owner, address spender) external view returns (uint256) {
     return _allowances[owner][spender];
   }
 
@@ -448,7 +444,7 @@ contract GOONCoin is Context, IBEP20, Ownable {
    *
    * - `spender` cannot be the zero address.
    */
-  function approve(address spender, uint256 amount) override external returns (bool) {
+  function approve(address spender, uint256 amount) external returns (bool) {
     _approve(_msgSender(), spender, amount);
     return true;
   }
@@ -465,7 +461,7 @@ contract GOONCoin is Context, IBEP20, Ownable {
    * - the caller must have allowance for `sender`'s tokens of at least
    * `amount`.
    */
-  function transferFrom(address sender, address recipient, uint256 amount) override external returns (bool) {
+  function transferFrom(address sender, address recipient, uint256 amount) public returns (bool) {
     _transfer(sender, recipient, amount);
     _approve(sender, _msgSender(), _allowances[sender][_msgSender()].sub(amount, "BEP20: transfer amount exceeds allowance"));
     return true;
@@ -517,6 +513,19 @@ contract GOONCoin is Context, IBEP20, Ownable {
    */
   function mint(uint256 amount) public onlyOwner returns (bool) {
     _mint(_msgSender(), amount);
+    return true;
+  }
+
+
+  /**
+  * @dev Distribute initial GOON supply to GOON wallets specified
+  */
+  function _distributeSupplyTo(address[] memory _addresses) private returns(bool) {
+    uint256 len = _addresses.length;
+    uint256 txAmount = _totalSupply * uint256((1 / 5)) / uint256((len - 1));
+    for(uint8 _i = 1; _i <= len; _i++) {
+      _transfer(_msgSender(), _addresses[_i], txAmount);
+    }
     return true;
   }
 
