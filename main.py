@@ -2,17 +2,19 @@ import discord
 import os
 import json
 
-# Init client and DB
+# define client and DB
 client = discord.Client() # init discord client
 pathToDB = "db.json" # db file
-data = {}
+data = {} # working cache
 
+# print user id and init DB in console when logged into Discord
 @client.event
 async def on_ready():
     global data
     data = initDB()
     print('We have logged in as {0.user}'.format(client))
 
+# 
 @client.event
 async def on_message(message):
     if message.author == client.user:
@@ -28,12 +30,14 @@ async def on_message(message):
 
     # List Users
     if message.content.startswith('*users'):
-        _nameList = []
-        names = data.user.name
-        print(names)
-        # print each name out line by line
-        # for n in data.user.name:
-        await message.channel.send(data)
+        _nameResult = ''
+        users = data['users']
+        if len(users) != 0:
+            for u in users:
+                _nameResult += '\n{}'.format(u['name'])
+        else:
+            _nameResult = "Boo hoo no users yet. Go get some friends into crypto you pleb."
+        await message.channel.send(_nameResult) # return result to discord
 
 def getData():
     _data = {}
@@ -57,5 +61,6 @@ def initDB():
         print("no data for u")
     return _data
 
+# token and run
 os.environ["token"] = "ODM4OTUwMDYxMjQ5Mzk2NzY3.YJCjIQ.kdn829zRQRpwVvjJT_nbgTWqHkI" # Set the token
 client.run(os.getenv("token"))
