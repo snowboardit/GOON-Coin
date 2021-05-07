@@ -39,6 +39,12 @@ async def on_message(message):
             _nameResult = "Boo hoo no users yet. Go get some friends into crypto you pleb."
         await message.channel.send(_nameResult) # return result to discord
 
+    # Link Address to User
+    if message.content.startswith('*'):
+
+
+
+
 def getData():
     _data = {}
     if os.path.exists(pathToDB):
