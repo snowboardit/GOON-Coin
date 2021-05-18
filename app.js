@@ -17,17 +17,13 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 
-
-
-
+//*************//
+//   ROUTES    //
+//*************//
 app.get('/', (req, res) => {
-  res.status == 200
-  res.render('index')
+  res.status = 200
+  res.render('index', {title: "GOONCoin"})
 })
-
-
-
-
 
 
 
