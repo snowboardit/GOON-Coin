@@ -392,7 +392,7 @@ contract GOONCoin is Context, IBEP20, Ownable {
   /**
    * @dev Returns the token symbol.
    */
-  function symbol() external view returns (string memory) {
+  function symbol() external view returns (string memory) { 
     return _symbol;
   }
 

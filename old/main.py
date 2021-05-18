@@ -1,7 +1,7 @@
 import discord
 import os
 import json
-import web3
+from web3 import Web3
 
 # define client and DB
 client = discord.Client() # init discord client
@@ -43,7 +43,7 @@ async def on_message(message):
     # Link Address to User
     if message.content.startswith('*balance'):
         # get message sender
-
+        _sender = message.content
         # use Web3 api to query the users wallet balance, given an address
         pass
 
