@@ -36,6 +36,7 @@ app.get('/', async (req, res) => {
     
     const data = await fetch(`https://discord.com/api/users/@me`, {headers: { Authorization: `Bearer ${req.session.bearer_token}` } }); // Fetching user data
     const json = await data.json();
+    
 
     if(!json.username) // This can happen if the Bearer token has expired or user has not given permission "indentity"
         return res.redirect('/login') // Redirect to login page

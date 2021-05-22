@@ -1,2 +1,2 @@
 # Exclude token
-.env
+node_modules
