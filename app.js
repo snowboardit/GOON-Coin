@@ -1,3 +1,4 @@
+// Imports
 const config = require('./config.json');
 var FormData = require('form-data');
 var fetch = require('node-fetch');
@@ -8,8 +9,12 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var Web3 = require('web3');
 
+// Variables
 var app = express();
-var web3 = new Web3(Web3.givenProvider || 'https://data-seed-prebsc-1-s1.binance.org:8545');
+var web3 = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'); // Web3.givenProvider || binance smart chain testnet url
+const abi = require('./abi.json')
+const address = '0xae499edc33108c4ae2a64e7af28e215892a203f9'
+
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -30,16 +35,21 @@ app.use(require('express-session')(config.session))
 
 // GET: Index
 app.get('/', async (req, res) => {
-    console.log(req.session.bearer_token);
+    console.log("token: ",req.session.bearer_token);
     if(!req.session.bearer_token)
         return res.redirect('/login') // Redirect to login page
     
     const data = await fetch(`https://discord.com/api/users/@me`, {headers: { Authorization: `Bearer ${req.session.bearer_token}` } }); // Fetching user data
     const json = await data.json();
-    
 
-    if(!json.username) // This can happen if the Bearer token has expired or user has not given permission "indentity"
+    // Connect with GOON Coin smart contract
+    const contract = new web3.eth.Contract(abi, address)
+    var _totalSupply = 
+    // var // make web3 request to get balance of wallet
+
+    if (!json.username) { // This can happen if the Bearer token has expired or user has not given permission "indentity"
         return res.redirect('/login') // Redirect to login page
+    }
 
     res.send(`<h1>Hello, ${json.username}#${json.discriminator}!</h1>` +
               `<img src="https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}?size=512">` + // Show user's nametag and avatar
