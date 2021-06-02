@@ -1,0 +1,2 @@
+# GOONcoin
+GoonCoin
