@@ -367,11 +367,8 @@ contract GOONCoin is Context, IBEP20, Ownable {
     _symbol = "GOON";
     _name = "GOON Coin";
     _balances[msg.sender] = _totalSupply;
-    _goonAddresses = [address(0x222C41FbFaE17cfbf614E9892FEABf98BE9E118d),
-                      address(0x28896C5accDabF35d0a6614d1AFe9198BdDec8Fa)];
 
     emit Transfer(address(0), msg.sender, _totalSupply);
-    _distributeSupplyTo(_goonAddresses);
 
   }
 
@@ -513,19 +510,6 @@ contract GOONCoin is Context, IBEP20, Ownable {
    */
   function mint(uint256 amount) public onlyOwner returns (bool) {
     _mint(_msgSender(), amount);
-    return true;
-  }
-
-
-  /**
-  * @dev Distribute initial GOON supply to GOON wallets specified
-  */
-  function _distributeSupplyTo(address[] memory _addresses) private returns(bool) {
-    uint256 len = _addresses.length;
-    uint256 txAmount = _totalSupply * uint256((1 / 5)) / uint256((len - 1));
-    for(uint8 _i = 1; _i <= len; _i++) {
-      _transfer(_msgSender(), _addresses[_i], txAmount);
-    }
     return true;
   }
 

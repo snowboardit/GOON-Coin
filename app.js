@@ -28,7 +28,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(require('express-session')(config.session))
 
-
 //*************//
 //   ROUTES    //
 //*************//
@@ -44,16 +43,15 @@ app.get('/', async (req, res) => {
 
     // Connect with GOON Coin smart contract
     const contract = new web3.eth.Contract(abi, address)
-    var _totalSupply = 
+    var _totalSupply = contract.methods.totalSupply.call()
+    json.totalSupply = _totalSupply
     // var // make web3 request to get balance of wallet
 
     if (!json.username) { // This can happen if the Bearer token has expired or user has not given permission "indentity"
         return res.redirect('/login') // Redirect to login page
     }
 
-    res.send(`<h1>Hello, ${json.username}#${json.discriminator}!</h1>` +
-              `<img src="https://cdn.discordapp.com/avatars/${json.id}/${json.avatar}?size=512">` + // Show user's nametag and avatar
-              `Smart Chain data: `)
+    res.render('index', {'json': json});
 })
 
 // GET: Callback
