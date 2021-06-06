@@ -5,6 +5,7 @@
   "dependencies": {
     "cookie-parser": "~1.4.4",
     "debug": "~2.6.9",
+    "discord.js": "^12.5.3",
     "ejs": "^2.6.2",
     "express": "^4.17.1",
     "express-session": "^1.17.1",

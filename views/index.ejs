@@ -3,11 +3,25 @@
   <head>
     <title>GOON Coin</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" type="text/css" href="semantic-ui/semantic.min.css">
+    <script
+    src="https://code.jquery.com/jquery-3.1.1.min.js"
+    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+    crossorigin="anonymous"></script>
+    <script src="semantic-ui/semantic.min.js"></script>
     <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico"/>
   </head>
   <body>
-    <h1>Hello, <%=json.username%>#<%=json.discriminator%>!</h1>
-    <img src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512">
-    <h3>Balance: <%= balanceOfWallet %></h3>
+    <div class="ui fixed inverted menu">
+      <div class="ui container">
+        <a href="#" class="header item">
+          <img class="logo" src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512">
+          Welcome, <%=json.username%>#<%=json.discriminator%>!
+        </a>
+        <div class="right menu">
+          <a href="#" class="item">Balance: <%= balanceOfWallet %></a>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
