@@ -14,6 +14,7 @@ var app = express();
 var web3 = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'); // Web3.givenProvider || binance smart chain testnet url
 const abi = require('./abi.json')
 const address = '0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a'
+const dev_address = '0x222C41FbFaE17cfbf614E9892FEABf98BE9E118d'
 
 
 // view engine setup
@@ -43,9 +44,15 @@ app.get('/', async (req, res) => {
 
     // Connect with GOON Coin smart contract
     const contract = new web3.eth.Contract(abi, address)
-    var _totalSupply = contract.methods.totalSupply.call()
-    console.log("Total Supply: ", _totalSupply.json())
-    // var // make web3 request to get balance of wallet
+    console.log("Contract: ", contract)
+    var _balanceOfWallet;
+    try {
+      _balanceOfWallet = await contract.methods.balanceOf(dev_address).call()
+    } catch (err) {
+      console.log(err)
+    }
+     
+    console.log("Total Supply: ", _balanceOfWallet)
 
     if (!json.username) { // This can happen if the Bearer token has expired or user has not given permission "indentity"
         return res.redirect('/login') // Redirect to login page
@@ -53,7 +60,7 @@ app.get('/', async (req, res) => {
 
     res.render('index', {
       'json': json,
-      'totalSupply': _totalSupply
+      'balanceOfWallet': _balanceOfWallet
   });
 })
 
