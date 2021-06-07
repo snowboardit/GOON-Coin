@@ -19,10 +19,10 @@ const abi = require('./abi.json')
 const address = '0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a'
 const bot_address = '0x59fd0131484833435939CFA678A70A018eD03a23'
 var wallet = web3.eth.accounts.wallet.create();
-const contract = new web3.eth.Contract(abi, address);
+var contract = new web3.eth.Contract(abi, address);
 
-// Load wallet with botn account at index 0, then load all other accounts in db
-wallet.add('0x8cd25967883a54390a035b19f78a6a1e037a47f2ccabed0769a8aad4143196d3')
+// Load wallet with bot account at index 0
+wallet.add('0x6e2677c0453e9eb9bde57420dba54fa8228b220bb74a3fb3b386b3cd8cbb37ef')
 // TODO: LOAD OTHER ACCOUNTS INTO LOCAL WALLET FROM DB FOR EACH USER ACCOUNT
 
 // DB Setup
@@ -102,19 +102,29 @@ app.get('/', async (req, res) => {
         console.log('user not in DB')
 
         // Create new account - public/private key pair
-        const new_account = web3.eth.accounts.create();
+        var new_account = web3.eth.accounts.create();
         console.log("new account", new_account)
 
 				// load account into wallet
 				wallet.add(new_account);
-				console.log('new account added: ', wallet)
+				console.log('new account added: ', new_account)
 				
 				// Give new account 100? GOON from dev wallet
-				try {
-					contract.methods.transfer(new_account.address, 100000000000).call( { from: '0x59fd0131484833435939CFA678A70A018eD03a23' } )
-				} catch (err) {
-					console.log('transaction err: ', err)
-				}
+        var gas_est;
+        var receipt = await contract.methods.transfer('0x1b76e0568DF572b74530b8805C2033c301e91F45', '100000000000000000000')
+            .send({from: '0x59fd0131484833435939CFA678A70A018eD03a23', gas: 1000000 }); 
+        console.log('receipt!: ', receipt);
+
+				// try {
+        //   const gas_est = await contract.methods.transfer(new_account.address, '100000000000000000000').estimateGas()
+				// 	contract.methods.transfer(new_account.address, '100000000000000000000').send( {from: bot_address, gas: gas_est})
+        //     .on('receipt', function(receipt) {
+        //       console.log('receipt!: ', receipt)
+        //     })
+        
+				// } catch (err) {
+				// 	console.log('transaction err: ', err)
+				// }
 					// from: wallet[0],
 					// to: '0x59fd0131484833435939CFA678A70A018eD03a23',
 					// value: '1000000000000000',
