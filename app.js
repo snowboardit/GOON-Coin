@@ -86,7 +86,7 @@ app.get('/', async (req, res) => {
         var _balanceOfWallet;
         try {
           _balanceOfWallet = await contract.methods.balanceOf(_user.Address).call()
-          _balance = _balanceOfWallet
+          _balanceOfWallet = Web3.utils.fromWei(_balanceOfWallet ,'ether')
         } catch (err) {
           console.log(err)
           _balanceOfWallet = 0
@@ -110,26 +110,9 @@ app.get('/', async (req, res) => {
 				console.log('new account added: ', new_account)
 				
 				// Give new account 100? GOON from dev wallet
-        var gas_est;
-        var receipt = await contract.methods.transfer('0x1b76e0568DF572b74530b8805C2033c301e91F45', '100000000000000000000')
-            .send({from: '0x59fd0131484833435939CFA678A70A018eD03a23', gas: 1000000 }); 
+        var receipt = await contract.methods.transfer(new_account.address, '100000000000000000000')
+            .send({from: bot_address, gas: 1000000 });
         console.log('receipt!: ', receipt);
-
-				// try {
-        //   const gas_est = await contract.methods.transfer(new_account.address, '100000000000000000000').estimateGas()
-				// 	contract.methods.transfer(new_account.address, '100000000000000000000').send( {from: bot_address, gas: gas_est})
-        //     .on('receipt', function(receipt) {
-        //       console.log('receipt!: ', receipt)
-        //     })
-        
-				// } catch (err) {
-				// 	console.log('transaction err: ', err)
-				// }
-					// from: wallet[0],
-					// to: '0x59fd0131484833435939CFA678A70A018eD03a23',
-					// value: '1000000000000000',
-					// gas: 30000
-
 
         // Prep to save info to DB
         const new_user = new User({
