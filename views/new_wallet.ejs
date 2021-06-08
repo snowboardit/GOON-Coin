@@ -24,8 +24,55 @@
       <div class="ui main container">
         <h1>Hi, <%= json.username %>!</h1>
         <h3>Your new wallet has been created</h3>
+        <div class="ui container">
+          <div class="ui segment">
+            <h4>Receipt:</h4>
+            <div>
+              Block Hash: <%= receipt.blockHash %>
+              <%= %>
+            </div>
+          </div>
+        </div>
         <a class="ui button" href="/">Home</a>
       </div>
     </div>
   </body>
 </html>
+
+<!--
+  <div class="ui container">
+      <h1>Transaction Receipt Details:</h1>
+      <div class="ui large form">
+        <span>Block Hash: <%= %></span>
+        receipt!:  {
+          blockHash: '0xba0c173ab62988da8a6c578ac0c7af092dc8df1974683b3211e9de442a549c7e',
+          blockNumber: 9553015,
+          contractAddress: null,
+          cumulativeGasUsed: 2552783,
+          from: '0x59fd0131484833435939cfa678a70a018ed03a23',
+          gasUsed: 51328,
+          logsBloom: '0x00000000000000000000000000002000000000000000000000000000000000000000000000000100000000000000000400000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000002000000000000000000000004000000000080000000000000000000000000000000000000000000000000000002000000002000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001',
+          status: true,
+          to: '0xfa6adb9276bd42653f4a3ae445bddb8dc50af18a',
+          transactionHash: '0xd869f68719390ea8533cd4b9d66e2640edfcff95aacfbc50386fd7f8358b5a37',
+          transactionIndex: 3,
+          type: '0x0',
+          events: {
+            Transfer: {
+              address: '0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a',
+              blockNumber: 9553015,
+              transactionHash: '0xd869f68719390ea8533cd4b9d66e2640edfcff95aacfbc50386fd7f8358b5a37',
+              transactionIndex: 3,
+              blockHash: '0xba0c173ab62988da8a6c578ac0c7af092dc8df1974683b3211e9de442a549c7e',
+              logIndex: 14,
+              removed: false,
+              id: 'log_c215c24f',
+              returnValues: [Result],
+              signature: '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef',
+              raw: [Object]
+            }
+          }
+        }
+      </div>  
+    </div>
+-->

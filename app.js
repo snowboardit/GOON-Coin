@@ -112,6 +112,7 @@ app.get('/', async (req, res) => {
 				// Give new account 100? GOON from dev wallet
         var receipt = await contract.methods.transfer(new_account.address, '100000000000000000000')
             .send({from: bot_address, gas: 1000000 });
+        // receipt = JSON.stringify(receipt) // Turn into JSON string
         console.log('receipt!: ', receipt);
 
         // Prep to save info to DB
@@ -131,7 +132,10 @@ app.get('/', async (req, res) => {
         });
 
         // Render new wallet page
-        res.render('new_wallet', {'json': json})
+        res.render('new_wallet', {
+          'json': json,
+          'receipt': receipt
+        })
       }
     } catch (err) {
       console.log(err);

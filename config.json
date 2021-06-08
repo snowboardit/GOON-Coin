@@ -1,7 +1,7 @@
 {
     "port": "3000",
     "oauth2": {
-        "redirect_uri": "http://localhost:3000/login/callback", 
+        "redirect_uri": "http://localhost:3000/login/callback",
         "client_id": "838950061249396767",
         "secret": "yro8SnKRMN9RSLT-wxx3ru-5rE5b5Oww",
         "scopes": ["identify"]
