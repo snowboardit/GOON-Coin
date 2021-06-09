@@ -12,7 +12,7 @@
     <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico"/>
   </head>
   <body>
-    <div class="ui fixed inverted menu">
+    <div class="ui huge fixed inverted menu">
       <div class="ui container">
         <a href="#" class="header item">
           <img class="logo" src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512">
@@ -23,17 +23,26 @@
     <div>
       <div class="ui main container">
         <h1>Hi, <%= json.username %>!</h1>
-        <h3>Your new wallet has been created</h3>
+        <h3 class="ui success">Your new wallet has been created with 100 GOON. Enjoy!</h3>
         <div class="ui container">
           <div class="ui segment">
             <h4>Receipt:</h4>
             <div>
-              Block Hash: <%= receipt.blockHash %>
-              <%= %>
+              🏧 <strong>Transaction Hash:</strong> <%= receipt.transactionHash %>
+            </div>
+            <div>
+              📨 <strong>To:</strong> <%= receipt.to %>
+            </div>
+            <div>
+              📩 <strong>From:</strong> <%= receipt.from %>
+            </div>
+            <div class="ui divider"></div>
+            <div>
+              <a class="ui blue button" href="https://testnet.bscscan.com/tx/<%=receipt.transactionHash%>">View Transaction on Etherscan</a>
+              <a class="ui green button" href="/">Home</a>
             </div>
           </div>
         </div>
-        <a class="ui button" href="/">Home</a>
       </div>
     </div>
   </body>

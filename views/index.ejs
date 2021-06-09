@@ -12,15 +12,35 @@
     <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico"/>
   </head>
   <body>
-    <div class="ui fixed inverted menu">
-      <div class="ui container">
-        <a href="#" class="header item">
-          <img class="ui avatar image" src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512">
-          Welcome, <%=json.username%>#<%=json.discriminator%>!
+    <div class="ui stackable container huge green inverted menu">
+      <a href="#" class="header item">
+        <img class="ui avatar image" src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512">
+        Welcome, <%=json.username%>#<%=json.discriminator%>!
+      </a>
+      <a class="item active">
+        Send
+      </a>
+      <a class="item">
+        Receive
+      </a>
+      <div class="right menu">
+        <a href="#" class="item">
+          Balance: <%= balanceOfWallet %>
         </a>
-        <div class="right menu">
-          <a href="#" class="item">Balance: <%= balanceOfWallet %></a>
+        <a class="item" href="/logout">Logout</a>
+      </div>
+    </div>
+    <div class="ui fluid centered stackable grid">
+      <div class="four wide column">
+        <div class="four wide row">
+          <div class="ui segment"></div>
         </div>
+      </div>
+      <div class="eight wide column">
+        <div class="ui segment"></div>
+      </div>
+      <div class="four wide column">
+        <div class="ui segment"></div>
       </div>
     </div>
   </body>

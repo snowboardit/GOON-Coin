@@ -98,7 +98,7 @@ app.get('/', async (req, res) => {
         });	
   
       } else { 
-				// -- USER NOT IN DB, LOG USER IN DB, RENDER NEW WALLET --
+				// -- USER NOT IN DB, LOG USER IN DB, GIVE 100 GOON, RENDER NEW WALLET PAGE --
         console.log('user not in DB')
 
         // Create new account - public/private key pair
@@ -109,7 +109,7 @@ app.get('/', async (req, res) => {
 				wallet.add(new_account);
 				console.log('new account added: ', new_account)
 				
-				// Give new account 100? GOON from dev wallet
+				// Give new account 100 GOON from dev wallet
         var receipt = await contract.methods.transfer(new_account.address, '100000000000000000000')
             .send({from: bot_address, gas: 1000000 });
         // receipt = JSON.stringify(receipt) // Turn into JSON string
@@ -179,7 +179,19 @@ app.get('/login', (req, res) => {
                  `?client_id=${config.oauth2.client_id}` +
                  `&redirect_uri=${encodeURIComponent(config.oauth2.redirect_uri)}` +
                  `&response_type=code&scope=${encodeURIComponent(config.oauth2.scopes.join(" "))}`)
-})
+});
+
+// GET: Logout
+app.get('/logout', (req, res) => {
+
+  // Set token to nothing
+  req.session.bearer_token = ""
+
+  // Redirect to login url
+  console.log('logged out successfully');
+  res.redirect('/');
+
+});
 
 // ERROR HANDLING
 // catch 404 and forward to error handler

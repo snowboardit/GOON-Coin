@@ -33,14 +33,32 @@ client.on('ready', () => {
   console.log(`Logged in as ${client.user.tag}!`);
 });
 
-// 
+// GET BALANCE
 client.on('message', msg => {
   if (msg.content === '*balance') {
-    // check who sent the request
-
+    // Look up msg author id in DB to find GOON wallet address
+    const _user = User.findOne({ Discord_ID: msg.author.id }).exec()
+    
+    console.log("user: ",_user)
+    
     // fetch 
-    msg.reply('Pong!');
+    msg.reply(_user);
   }
 });
+
+// SEND GOON COIN
+// Params:
+// <recipient>: String
+// <amount>: Int
+//
+// client.on('message', msg => {
+//   if (msg.content === '*balance') {
+//     // check who sent the request
+//     const _author = msg.author
+//     console.log("author: ",_author)
+//     // fetch 
+//     msg.reply('Pong!');
+//   }
+// });
 
 client.login('ODM4OTUwMDYxMjQ5Mzk2NzY3.YJCjIQ.kdn829zRQRpwVvjJT_nbgTWqHkI');
