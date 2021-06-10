@@ -41,9 +41,14 @@
         <div class="ui large form">
           <div class="ui segment">
             <div class="field">
-              <div class="ui left icon input">
-                <i class="user icon"></i>
-                <input type="text" name="address" placeholder="Recipient Address">
+              <div class="ui fluid search selection dropdown">
+                <input type="hidden" name="user">
+                <i class="dropdown icon"></i>
+                <div class="default text">Select User</div>
+                <div class="menu">
+                <div class="item" data-value="af"><i class="af flag"></i>Afghanistan</div>
+                <div class="item" data-value="ax"><i class="ax flag"></i>Aland Islands</div>
+                <div class="item" data-value="zw"><i class="zw flag"></i>Zimbabwe</div>
               </div>
             </div>
             <div class="field">
