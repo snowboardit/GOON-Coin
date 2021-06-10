@@ -12,6 +12,7 @@ const mongoose = require('mongoose');
 
 
 // Variables
+const _port = 443;
 var app = express();
 var web3 = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545'); // Web3.givenProvider || binance smart chain testnet url
 mongoose.connect('mongodb://localhost/GoonCoin', {useNewUrlParser: true, useUnifiedTopology: true}); // Connect DB
@@ -193,25 +194,10 @@ app.get('/logout', (req, res) => {
 
 });
 
-// ERROR HANDLING
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
-
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-  
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
-});
+// ERROR
 
 
 // Server 
-app.listen(3000, () => {
-  console.log('Express started on port 3000');
+app.listen(_port, () => {
+  console.log(`Express started on port ${_port}`);
 });

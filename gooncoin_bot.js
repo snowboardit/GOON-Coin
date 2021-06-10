@@ -37,14 +37,18 @@ client.on('ready', () => {
 client.on('message', msg => {
   if (msg.content === '*balance') {
     // Look up msg author id in DB to find GOON wallet address
-    const _user = User.findOne({ Discord_ID: msg.author.id }).exec()
-    
-    console.log("user: ",_user)
-    
+    var _user = findUser(msg.author.id);
+        
     // fetch 
-    msg.reply(_user);
+    msg.reply('user');
   }
 });
+
+async function findUser(id) {
+  var foundUser = await User.findOne({ Discord_ID: id})
+  console.log(foundUser)
+  return foundUser
+}
 
 // SEND GOON COIN
 // Params:
