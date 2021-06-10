@@ -109,7 +109,8 @@ app.get('/', async (req, res) => {
       // IF existing user, render the home page
       res.render('index', {
         'json': json,
-        'balanceOfWallet': _balanceOfWallet
+        'balanceOfWallet': _balanceOfWallet,
+        'address': _user.Address
       });	
 
     } else { 
@@ -192,7 +193,8 @@ app.get('/receive', async (req, res) => {
       // IF existing user, render the home page
       res.render('receive', {
         'json': json,
-        'balanceOfWallet': _balanceOfWallet
+        'balanceOfWallet': _balanceOfWallet,
+        'address': _user.Address
       })
     }
   } catch (err) {
