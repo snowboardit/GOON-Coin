@@ -1,0 +1,17 @@
+{
+    "port": "8443",
+    "oauth2": {
+        "redirect_uri": "https://192.168.1.8:8443/login/callback",
+        "client_id": "838950061249396767",
+        "secret": "yro8SnKRMN9RSLT-wxx3ru-5rE5b5Oww",
+        "scopes": ["identify"]
+    },
+    "session": {
+        "secret": "youshallnotpass",
+        "cookie": {
+            "maxAge": 86400000
+        },
+        "resave": true,
+        "saveUninitialized": false
+    }
+}

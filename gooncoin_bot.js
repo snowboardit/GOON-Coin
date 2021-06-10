@@ -2,12 +2,18 @@
 const Discord = require('discord.js');
 const mongoose = require('mongoose');
 var Web3 = require('web3');
+const abi = require('./abi.json');
 
 // Variables/constants
+const address = '0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a';
+const bot_address = '0x59fd0131484833435939CFA678A70A018eD03a23';
 const client = new Discord.Client();
 mongoose.connect('mongodb://localhost/GoonCoin', {useNewUrlParser: true, useUnifiedTopology: true}); // Connect DB
 const db = mongoose.connection;
 var web3 = new Web3('https://data-seed-prebsc-1-s1.binance.org:8545');
+var contract = new web3.eth.Contract(abi, address);
+
+
 
 
 // DB Setup
@@ -34,20 +40,33 @@ client.on('ready', () => {
 });
 
 // GET BALANCE
-client.on('message', msg => {
+client.on('message', async (msg) => {
   if (msg.content === '*balance') {
-    // Look up msg author id in DB to find GOON wallet address
-    var _user = findUser(msg.author.id);
+
+    // Find sender address
+    var _user = await User.findOne({ Discord_ID: msg.author.id});
+    console.log(`Address: ${_user.Address}`);
+
+    // Retrieve balance of address
+    var _balanceOfWallet;
+      try {
+        _balanceOfWallet = await contract.methods.balanceOf(_user.Address).call()
+        _balanceOfWallet = Web3.utils.fromWei(_balanceOfWallet ,'ether')
+      } catch (err) {
+        console.log(err)
+        _balanceOfWallet = 0
+      }
         
     // fetch 
-    msg.reply('user');
+    msg.reply(`your balance is ${_balanceOfWallet} GOON`);
   }
 });
 
-async function findUser(id) {
+// Find user address
+async function findUserAddress(id) {
   var foundUser = await User.findOne({ Discord_ID: id})
   console.log(foundUser)
-  return foundUser
+  return foundUser.address
 }
 
 // SEND GOON COIN
