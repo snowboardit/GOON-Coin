@@ -2,28 +2,38 @@
 <html>
   <head>
     <title>GOON Coin</title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel="stylesheet" type="text/css" href="semantic-ui/semantic.min.css">
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="semantic-ui/semantic.min.css"
+    />
     <script
-    src="https://code.jquery.com/jquery-3.1.1.min.js"
-    integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-    crossorigin="anonymous"></script>
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"
+    ></script>
     <script src="semantic-ui/semantic.min.js"></script>
-    <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico"/>
+    <script>
+      // Init user selection dropdown
+      window.onload = function () {
+        $(".ui.selection.dropdown").dropdown();
+      };
+    </script>
+    <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico" />
   </head>
   <body>
     <!-- Navbar -->
     <div class="ui stackable huge green inverted menu">
       <a href="#" class="header item">
-        <img class="ui avatar image" src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512">
+        <img
+          class="ui avatar image"
+          src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512"
+        />
         Welcome, <%=json.username%>#<%=json.discriminator%>!
       </a>
-      <a class="item active" href="/">
-        Send
-      </a>
-      <a class="item" href="/receive">
-        Receive
-      </a>
+      <a class="item active" href="/"> Send </a>
+      <a class="item" href="/wallet"> Wallet </a>
       <div class="right menu">
         <a href="https://testnet.bscscan.com/address/<%=address%>" class="item">
           Balance: <%= balanceOfWallet %>
@@ -38,23 +48,40 @@
         <!-- <div class="ui segment"></div> -->
       </div>
       <div class="eight wide column">
+        <h1>Send GOON To</h1>
         <div class="ui large form">
           <div class="ui segment">
             <div class="field">
-              <div class="ui fluid search selection dropdown">
-                <input type="hidden" name="user">
+              <div
+                class="ui fluid search selection dropdown"
+                id="user_dropdown"
+              >
+                <input type="hidden" name="user" />
                 <i class="dropdown icon"></i>
                 <div class="default text">Select User</div>
                 <div class="menu">
-                <div class="item" data-value="af"><i class="af flag"></i>Afghanistan</div>
-                <div class="item" data-value="ax"><i class="ax flag"></i>Aland Islands</div>
-                <div class="item" data-value="zw"><i class="zw flag"></i>Zimbabwe</div>
+                  <% user_list.forEach(function(u) { %>
+                  <div class="item">
+                    <% if (u.Avatar) { %>
+                    <img
+                      class="ui avatar image"
+                      src="https://cdn.discordapp.com/avatars/<%=u.Discord_ID%>/<%=u.Avatar%>?size=512"
+                    />
+                    <% } else { %>
+                    <img class="ui avatar image" src="images/user64px.png" />
+                    <% } %>
+                    <span class="item" data-value="<%= u.Discord_ID %>"
+                      ><%= u.Username %>#<%= u.Discriminator %></span
+                    >
+                  </div>
+                  <% }) %>
+                </div>
               </div>
             </div>
             <div class="field">
               <div class="ui left icon input">
                 <i class="credit card icon"></i>
-                <input type="text" name="amount" placeholder="Amount">
+                <input type="text" name="amount" placeholder="Amount" />
               </div>
             </div>
             <div class="ui fluid large blue submit button">Send (inop.)</div>

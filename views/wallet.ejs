@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>GOON Coin</title>
+    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="semantic-ui/semantic.min.css"
+    />
+    <script
+      src="https://code.jquery.com/jquery-3.1.1.min.js"
+      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
+      crossorigin="anonymous"
+    ></script>
+    <script src="semantic-ui/semantic.min.js"></script>
+    <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <div class="ui stackable huge green inverted menu">
+      <a href="#" class="header item">
+        <img
+          class="ui avatar image"
+          src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512"
+        />
+        Welcome, <%=json.username%>#<%=json.discriminator%>!
+      </a>
+      <a class="item" href="/"> Send </a>
+      <a class="item active" href="/wallet"> Wallet </a>
+      <div class="right menu">
+        <a
+          href="https://testnet.bscscan.com/address/<%=user.Address%>"
+          class="item"
+        >
+          Balance: <%= balanceOfWallet %>
+        </a>
+        <a class="item" href="/logout">Logout</a>
+      </div>
+    </div>
+    <div>
+      <div class="ui main container">
+        <h1>Hi, <%= json.username %>!</h1>
+        <div class="ui container">
+          <div class="ui segment">
+            <h2>Smart Contract:</h2>
+            <div>
+              <strong>Contract Address:</strong> <%= contract_address %>
+            </div>
+            <div><strong>Name & Ticker:</strong> GOON Coin (GOON)</div>
+            <div><strong>Total Supply:</strong> 1000000.000000000000000000</div>
+            <div><strong>Decimals:</strong> 18</div>
+            <div class="ui divider"></div>
+            <h2>Wallet:</h2>
+            <div>💼 <strong>Wallet Address:</strong> <%= user.Address %></div>
+            <div>🔑 <strong>Private Key:</strong> <%= user.Key %></div>
+            <div class="ui divider"></div>
+            <div>
+              <a
+                class="ui blue button"
+                href="https://testnet.bscscan.com/token/<%= contract_address %>?a=<%= user.Address %>"
+                >View Transactions on BSC Scan</a
+              >
+              <a
+                class="ui green button"
+                href="https://testnet.binance.org/faucet-smart"
+                >Get Testnet BNB</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
