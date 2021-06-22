@@ -16,6 +16,7 @@ const db = mongoose.connection;
 var web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545");
 var contract = new web3.eth.Contract(abi, address);
 var recipient_cache;
+var wallet = web3.eth.accounts.wallet.create();
 
 // DB Setup
 db.on("error", console.error.bind(console, "connection error:"));
@@ -69,7 +70,8 @@ client.on("message", async (msg) => {
 client.on("message", async (msg) => {
   if (msg.content === "*list") {
     var _reply_begin = "who would you like to send to?";
-    var _reply_end= "**Sending Format:** *send <username> <amount w/out decimals>";
+    var _reply_end =
+      "**Sending Format:** *send <username> <amount w/out decimals>";
     var _reply_temp = [];
     var _reply_users = "";
     var index = 1;
@@ -90,28 +92,83 @@ client.on("message", async (msg) => {
 
     // Reply to the user with a list of current users
     msg.reply(`${_reply_begin}\n\n${_reply_users}\n\n${_reply_end}`);
-
   }
 });
 
 // SEND GOON COIN
 // Params:
-// <recipient>: String
-// <amount>: Int
+// > recipient: String
+// > amount: Int
 client.on("message", async (msg) => {
   if (msg.content.startsWith("*send")) {
+
     // Break message content into an array
     _message_params = msg.content.split(" ");
-    console.log(_message_params);
+    console.log(`params: ${_message_params}`);
+    
+    // If message doesn't contain command, recipient, or amount, reply to user with error
+    // Else find user, fetch their address and private key from DB, then send 
+    if (_message_params.length != 3) {
+      msg.reply(`Invalid input. Please make sure your command follows this format:\n
+                ***send** <username> <amount w/out decimals>`);
+    } else {
+      // Find sender and recipient addresses
+      let recipient_address = ""
+      
+      var sending_user = await User.findOne({ Discord_ID: msg.author.id });
+      console.log(`Address: ${sending_user.Address}\nKey: ${sending_user.Key}`);
 
-    // Find sender and recipient addresses
-    var sending_user = await User.findOne({ Discord_ID: msg.author.id });
-    console.log(`Address: ${sending_user.Address}`);
+      var recipients = await User.find({}, "Username");
+      console.log(`***** Recipients: \n${recipients}`)
+      for (r in recipients.Username) {
+        console.log(`***** Recipient: \n${r}`)
+        if (r == sending_user.Address.toLowerCase()) {
+          console.log(`!!** Found r: ${r}`)
+        }
+      };
+            
+      // Restore account from private key
+      try {
+        var new_account = await web3.eth.accounts.privateKeyToAccount(sending_user.Key);
+        console.log("new account", new_account);
+        
+        // Add to wallet
+        wallet.add(new_account);
+      } catch (err) {
+        console.log(`err restoring account from key: ${err}`);
+      }
+      
+      // Convert submitted user amount to ether
+      console.log(`amount:${_message_params[2]}\namount in ether:${amountToEther(_message_params[2])}`)
+      console.log(`Sender address: ${sending_user.Address}`)
 
-    // Reply to the user
-    msg.reply("Pong!");
+      // Give new account 100 GOON from dev wallet
+      try {
+        var receipt = await contract.methods
+        .transfer(recipient_address, amountToEther(_message_params[2]))
+        .send({ from: sending_user.Address, gas: 1000000 })
+        .on('err', function(err) {
+          console.log(err)
+        });
+
+        // Reply to the user
+        msg.reply(`${amountToEther(_message_params[2])} GOON sent successfully to ${_message_params[1]}!\nReceipt: ${receipt}`);
+        // Print receipt
+        console.log("receipt!: ", receipt);
+      
+      // Handle error
+      } catch (err) {
+        msg.reply(`Message could not be sent:\n${err}`)
+        console.log(`Error sending transaction:\n${err}`);
+      };
+    }
   }
 });
+
+// Convert simple amount to 18 decimal string
+function amountToEther(amount) {
+  return Web3.utils.toWei(amount, "ether");
+};
 
 // Log in to Discord
 client.login("ODM4OTUwMDYxMjQ5Mzk2NzY3.YJCjIQ.kdn829zRQRpwVvjJT_nbgTWqHkI");

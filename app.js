@@ -274,6 +274,7 @@ app.get("/login", (req, res) => {
 // GET: Send
 app.get("/send", (req, res) => {
   // req.query - fetch query parameters from submitted form: address and amount
+  res.redirect("/");
 });
 
 // GET: Logout
