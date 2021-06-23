@@ -70,8 +70,7 @@ client.on("message", async (msg) => {
 client.on("message", async (msg) => {
   if (msg.content === "*list") {
     var _reply_begin = "who would you like to send to?";
-    var _reply_end =
-      "**Sending Format:** *send <username> <amount w/out decimals>";
+    var _reply_end ="**Sending Format:** *send <username> <amount w/out decimals>";
     var _reply_temp = [];
     var _reply_users = "";
     var index = 1;
@@ -84,7 +83,7 @@ client.on("message", async (msg) => {
       if (index == recipients.length) {
         // if on the last recipient,
         console.log(`final index: ${index}`);
-        _reply_users = _reply_temp.join("\n");
+        _reply_users = _reply_temp.join("\n");  
         recipient_cache = _reply_users;
       }
       index++;
@@ -103,29 +102,30 @@ client.on("message", async (msg) => {
   if (msg.content.startsWith("*send")) {
 
     // Break message content into an array
-    _message_params = msg.content.split(" ");
+    let _message_params = msg.content.split(" ");
+    let _command = _message_params[0]
+    let _recipient = _message_params[1]
+    let _amount = _message_params[2]
+
     console.log(`params: ${_message_params}`);
-    
+
     // If message doesn't contain command, recipient, or amount, reply to user with error
     // Else find user, fetch their address and private key from DB, then send 
     if (_message_params.length != 3) {
       msg.reply(`Invalid input. Please make sure your command follows this format:\n
                 ***send** <username> <amount w/out decimals>`);
     } else {
-      // Find sender and recipient addresses
-      let recipient_address = ""
-      
-      var sending_user = await User.findOne({ Discord_ID: msg.author.id });
-      console.log(`Address: ${sending_user.Address}\nKey: ${sending_user.Key}`);
 
-      var recipients = await User.find({}, "Username");
-      console.log(`***** Recipients: \n${recipients}`)
-      for (r in recipients.Username) {
-        console.log(`***** Recipient: \n${r}`)
-        if (r == sending_user.Address.toLowerCase()) {
-          console.log(`!!** Found r: ${r}`)
-        }
-      };
+      // List arguments
+      console.log(`Command: ${_message_params[0]}\nRecipient: ${_recipient}\nAmount: ${_amount}`);
+
+      // Find sender and recipient addresses
+      var sending_user = await User.findOne({ Discord_ID: msg.author.id });
+      // console.log(`Address: ${sending_user.Address}\nKey: ${sending_user.Key}`);
+
+      var recipient = await User.findOne({ Username: _recipient });
+      console.log(`***** Recipient: \n${recipient}`);
+      
             
       // Restore account from private key
       try {
@@ -138,21 +138,21 @@ client.on("message", async (msg) => {
         console.log(`err restoring account from key: ${err}`);
       }
       
-      // Convert submitted user amount to ether
-      console.log(`amount:${_message_params[2]}\namount in ether:${amountToEther(_message_params[2])}`)
+      // console.log(`amount:${_amount}\namount in ether:${amountToEther(_amount)}`)
       console.log(`Sender address: ${sending_user.Address}`)
+      console.log(`Recipient address: ${recipient.Address}`)
 
       // Give new account 100 GOON from dev wallet
       try {
         var receipt = await contract.methods
-        .transfer(recipient_address, amountToEther(_message_params[2]))
-        .send({ from: sending_user.Address, gas: 1000000 })
-        .on('err', function(err) {
-          console.log(err)
-        });
+        .transfer(recipient.Address, amountToEther(_amount))
+        .send({ from: sending_user.Address, gas: 1000000 });
+
+        // Craft Receipt
+        let _receipt = `**Block Number:** ${receipt.blockNumber}\n**From Address:** ${receipt.from}\n**To Address:** ${receipt.to}\n**Gas Used:** ${receipt.gasUsed}\n**Transaction Hash:** ${receipt.transactionHash}\n\n**View Transaction on BSC Scan:** https://testnet.bscscan.com/tx/${receipt.transactionHash}`;
 
         // Reply to the user
-        msg.reply(`${amountToEther(_message_params[2])} GOON sent successfully to ${_message_params[1]}!\nReceipt: ${receipt}`);
+        msg.reply(`${_amount} GOON sent successfully to ${_recipient}!\n\n${_receipt}`);
         // Print receipt
         console.log("receipt!: ", receipt);
       

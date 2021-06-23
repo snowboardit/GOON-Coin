@@ -6,6 +6,7 @@ var createError = require("http-errors");
 var express = require("express");
 var path = require("path");
 var cookieParser = require("cookie-parser");
+const bodyParser = require('body-parser');
 var logger = require("morgan");
 var Web3 = require("web3");
 const mongoose = require("mongoose");
@@ -68,6 +69,7 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+app.use(bodyParser);
 app.use(express.static(path.join(__dirname, "public")));
 app.use(require("express-session")(config.session));
 app.use((req, res, next) => {
@@ -176,8 +178,6 @@ app.get("/", async (req, res) => {
   }
 });
 
-// GET: Send
-app.get("/send", async (req, res) => {});
 
 // GET: Wallet
 app.get("/wallet", async (req, res) => {
@@ -221,6 +221,15 @@ app.get("/wallet", async (req, res) => {
     res.redirect("/");
   }
 });
+
+
+// GET: Send
+app.get("/send", (req, res) => {
+  // req.query - fetch query parameters from submitted form: address and amount
+  console.log(`/SEND REQ:\n${req.body}`)
+  res.redirect("/");
+});
+
 
 // GET: Callback
 app.get("/login/callback", async (req, res) => {
@@ -269,12 +278,6 @@ app.get("/login", (req, res) => {
         config.oauth2.scopes.join(" ")
       )}`
   );
-});
-
-// GET: Send
-app.get("/send", (req, res) => {
-  // req.query - fetch query parameters from submitted form: address and amount
-  res.redirect("/");
 });
 
 // GET: Logout
