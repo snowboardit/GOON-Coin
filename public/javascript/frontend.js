@@ -1,9 +1,3 @@
-
-// User selection dropdown
-$('.ui.selection.dropdown').dropdown({
-    clearable: true
-  });
-
 $(document)
 .ready(function() {
   $('.ui.form')
@@ -26,7 +20,21 @@ $(document)
               prompt : 'Please enter an amount'
             }
           ]
+        },
+        sending_user: {
+          identifier  : 'sending_user',
         }
       }
-    })
+    }
+  )
+
+  // User selection dropdown
+  $('.ui.selection.dropdown').dropdown({
+    clearable: true
+  });
+  
+  $('button[type="submit"]').click(function(e) {
+    return $('.form').form('validate form');
+  });
+  
 });

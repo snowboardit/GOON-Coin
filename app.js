@@ -69,7 +69,8 @@ app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(bodyParser);
+app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(require("express-session")(config.session));
 app.use((req, res, next) => {
@@ -224,10 +225,38 @@ app.get("/wallet", async (req, res) => {
 
 
 // GET: Send
-app.get("/send", (req, res) => {
-  // req.query - fetch query parameters from submitted form: address and amount
-  console.log(`/SEND REQ:\n${req.body}`)
-  res.redirect("/");
+app.post("/send", async (req, res) => {
+  // req.body - fetch query parameters from submitted form: address, amount, and sending_user (hidden)
+  console.log(req.body);
+
+  // Assign vars
+  var _sending_user = new User();
+
+  // Find sending_user in db from id and fetch address and private key
+  try {
+    _sending_user = await User.findOne({ Discord_ID: req.body.sending_user });
+    console.log("FOUND USER: ", _sending_user);
+  } catch (err) {
+    console.log(`ERR finding user: ${err}`);
+  }
+
+  // Add account to wallet
+  var new_account = await web3.eth.accounts.privateKeyToAccount(_sending_user.Key);
+  wallet.add(new_account);
+  console.log(`new account created: ${new_account}`);
+
+  // Trigger transfer function
+  var receipt = await contract.methods
+    .transfer(recipient.Address, amountToEther(_amount))
+    .send({ from: sending_user.Address, gas: 1000000 });
+
+  console.log(receipt)
+
+  // If successful, redirect to success page with receipt summarized receipt params
+  // Otherwise, redirect to home and log error (later: show error banner)
+
+  // MAke a transaction
+
 });
 
 

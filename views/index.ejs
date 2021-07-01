@@ -14,12 +14,7 @@
       crossorigin="anonymous"
     ></script>
     <script src="semantic-ui/semantic.min.js"></script>
-    <script>
-      // Init user selection dropdown
-      window.onload = function () {
-        $(".ui.selection.dropdown").dropdown();
-      };
-    </script>
+    <script src="javascript/frontend.js"></script>
     <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico" />
   </head>
   <body>
@@ -44,50 +39,59 @@
 
     <!-- Body -->
     <div class="ui centered stackable grid">
+      
       <div class="four wide column">
         <!-- <div class="ui segment"></div> -->
       </div>
+
       <div class="eight wide column">
         <h1>Send GOON To</h1>
         <div class="ui segment">
-          <div class="ui large form" action="/send" method="POST">
+          <form class="ui large form" action="https://gooncoin.maxlareau.com/send" method="POST">
+
+            <div class="field" style="display: none;">
+              <input type="hidden" name="sending_user" value="<%= json.id %>"/>
+            </div>
+
             <div class="field">
               <div
                 class="ui fluid search selection dropdown"
                 id="user_dropdown"
               >
+                
                 <input type="hidden" name="user"/>
                 <i class="dropdown icon"></i>
                 <div class="default text">Select User</div>
                 <div class="menu">
                   <% user_list.forEach(function(u) { %>
-                  <div class="item">
+                  <div class="item" data-value="<%= u.Discord_ID %>">
                     <% if (u.Avatar) { %>
                     <img
                       class="ui avatar image"
                       src="https://cdn.discordapp.com/avatars/<%=u.Discord_ID%>/<%=u.Avatar%>?size=512"
                     />
                     <% } else { %>
-                    <img class="ui centered avatar image" src="images/user64px.png"/>
+                    <img class="ui avatar image" src="images/user64px.png"/>
                     <% } %>
-                    <span class="item" data-value="<%= u.Discord_ID %>"
-                      ><%= u.Username %>#<%= u.Discriminator %></span
-                    >
+                    <span><%= u.Username %>#<%= u.Discriminator %></span>
                   </div>
                   <% }) %>
                 </div>
               </div>
             </div>
+
             <div class="field">
               <div class="ui left icon input">
                 <i class="credit card icon"></i>
-                <input type="text" name="amount" placeholder="Amount" />
+                <input type="text" name="amount" placeholder="Amount"/>
               </div>
             </div>
-            <div class="ui fluid large blue submit button">Send</div>
-          </div>
+            <button class="ui fluid large blue submit button">Send</button>
+          </form>
+
         </div>
       </div>
+
       <div class="four wide column">
         <!-- <div class="ui segment"></div> -->
       </div>
