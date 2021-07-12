@@ -231,11 +231,18 @@ app.post("/send", async (req, res) => {
 
   // Assign vars
   var _sending_user = new User();
+  var _receiving_user = new User();
+  var _recipient = req.body.user;
+  var _sending_user = req.body.sending_user;
+  var _amount = req.body.amount;
+
+  console.log(`recip: ${_recipient}\nsending user: ${_sending_user}\namount: ${_amount}`);
 
   // Find sending_user in db from id and fetch address and private key
   try {
-    _sending_user = await User.findOne({ Discord_ID: req.body.sending_user });
-    console.log("FOUND USER: ", _sending_user);
+    _sending_user = await User.findOne({ Discord_ID: _sending_user });
+    _receiving_user = await User.findOne({ Discord_ID: _recipient })
+    console.log("FOUND USERS: ", _sending_user, _receiving_user);
   } catch (err) {
     console.log(`ERR finding user: ${err}`);
   }
@@ -247,13 +254,14 @@ app.post("/send", async (req, res) => {
 
   // Trigger transfer function
   var receipt = await contract.methods
-    .transfer(recipient.Address, amountToEther(_amount))
-    .send({ from: sending_user.Address, gas: 1000000 });
+    .transfer(_receiving_user.Address, amountToEther(_amount))
+    .send({ from: _sending_user.Address, gas: 1000000 });
 
   console.log(receipt)
 
   // If successful, redirect to success page with receipt summarized receipt params
   // Otherwise, redirect to home and log error (later: show error banner)
+  res.redirect("/");
 
   // MAke a transaction
 
@@ -319,6 +327,14 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
+// Funcs //
+// Convert simple amount to 18 decimal string
+function amountToEther(amount) {
+  return Web3.utils.toWei(amount, "ether");
+};
+
+
+// SERVER
 server.listen(_port, () => {
   console.log(`Express started on port ${_port}`);
 });

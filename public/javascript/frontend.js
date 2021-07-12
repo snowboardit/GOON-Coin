@@ -34,6 +34,7 @@ $(document)
   });
   
   $('button[type="submit"]').click(function(e) {
+    // Show processing transaction indicator
     return $('.form').form('validate form');
   });
   
