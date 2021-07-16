@@ -84,6 +84,11 @@ app.use((req, res, next) => {
 //   ROUTES    //
 //*************//
 
+// GET: Landing - Login with Discord or Wallet Address/Private key
+app.get("/landing", async (req, res) => {
+  res.render("landing");
+});
+
 // GET: Index
 app.get("/", async (req, res) => {
   // Check for auth token:
