@@ -48,6 +48,7 @@ db.once("open", function () {
   console.log("DB Connected!");
 });
 
+// Define DB schema
 const userSchema = new mongoose.Schema({
   Discord_ID: String,
   Name: String,
@@ -113,8 +114,10 @@ app.get("/", async (req, res) => {
       // -- USER IN DB, GET BALANCE, RENDER HOME --
       const _user = await User.findOne({ Discord_ID: json.id });
       const _user_list = await User.find({});
-      console.log("ADDRESS: ", _user.Address);
       var _balanceOfWallet;
+
+      console.log("ADDRESS: ", _user.Address);
+      
       try {
         _balanceOfWallet = await contract.methods
           .balanceOf(_user.Address)
@@ -124,6 +127,7 @@ app.get("/", async (req, res) => {
         console.log(err);
         _balanceOfWallet = 0;
       }
+
       // IF existing user, render the home page
       // Check if user avatar is null first
       res.render("index", {
@@ -268,7 +272,7 @@ app.post("/send", async (req, res) => {
   // Otherwise, redirect to home and log error (later: show error banner)
   res.redirect("/");
 
-  // MAke a transaction
+  // Make a transaction
 
 });
 
