@@ -1,2 +1,4 @@
-# Exclude token
 node_modules
+config.json
+dev-config.json
+certificate

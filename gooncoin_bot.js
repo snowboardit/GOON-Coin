@@ -3,6 +3,7 @@ const Discord = require("discord.js");
 const mongoose = require("mongoose");
 var Web3 = require("web3");
 const abi = require("./abi.json");
+const config = require("gooncoin_bot_config.json");
 
 // Variables/constants
 const address = "0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a";
@@ -45,7 +46,7 @@ client.on("ready", () => {
 client.on("message", async (msg) => {
   if (msg.content === "*balance") {
     // Let the user know we are working on their request
-    msg.channel.send("Fetching your balance... Hold a moment, pleb.");
+    msg.channel.send("Fetching your balance...");
 
     // Find sender address
     var _user = await User.findOne({ Discord_ID: msg.author.id });
@@ -171,4 +172,4 @@ function amountToEther(amount) {
 };
 
 // Log in to Discord
-client.login("ODM4OTUwMDYxMjQ5Mzk2NzY3.YJCjIQ.kdn829zRQRpwVvjJT_nbgTWqHkI");
+client.login(config.token);
