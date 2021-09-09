@@ -2,7 +2,7 @@
 <html>
   <head>
     <title>GOON Coin</title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
+    <link rel="stylesheet" href="/stylesheets/landing_style.css" />
     <link
       rel="stylesheet"
       type="text/css"
@@ -18,22 +18,35 @@
     <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico" />
   </head>
   <body>
-    <!-- CSS Grid here - similar or identical to index grid -->
-    <div class="ui container">
-      <div class="ui middle aligned center aligned stackable grid">
-      
-        <div class="four wide column">
-          <div class="ui segment"></div>
+    <div style="background-image: url(images/login_bg.jpg); size: auto auto;"></div>
+    <!-- Login Card -->
+    <div class="ui middle aligned center aligned grid container">
+    
+      <div class="two wide column">
+        <!-- <div class="ui segment"></div> -->
+      </div>
+
+      <div id="login_card" class="green twelve wide four segment column" style="padding: 4em 0px;">
+        <h1 id="landing_header" class="ui image header">
+          <img class="ui centered tiny image" src='images/GOONCoin-192x192.png' alt="">
+          GOON Coin
+        </h1>
+        <div class="row">
+          <button id="login_button" class="ui blue button">Login with Discord</button>
         </div>
-  
-        <div class="eight wide column">
-          <div class="ui segment"></div>
+        <div class="row">
+          <button class="ui gray button">Login with Wallet</button>
         </div>
-  
-        <div class="four wide column">
-          <div class="ui segment"></div>
+        <div class="ui divider"></div>
+        <div class="row">
+          <button class="ui gray button">Create new Wallet</button>
         </div>
       </div>
+
+      <div class="two wide column">
+        <!-- <div class="ui segment"></div> -->
+      </div>
+
     </div>
   </body>
 </html>

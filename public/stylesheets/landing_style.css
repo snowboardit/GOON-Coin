@@ -1,0 +1,19 @@
+body > .grid {
+    height: 100%;
+  }
+  .image {
+    margin-top: -100px;
+  }
+  .column {
+    max-width: 450px;
+  }
+  #landing-header {
+    background-color: white;
+  }
+  #login_card {
+    background-color: #21BA45;
+  }
+  #login_button {
+    margin-top: 1.5em;
+    margin-bottom: 1.15em;
+  }
