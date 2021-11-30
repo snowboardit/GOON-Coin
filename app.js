@@ -85,17 +85,12 @@ app.use((req, res, next) => {
 //   ROUTES    //
 //*************//
 
-// GET: Landing - Login with Discord or Wallet Address/Private key
-app.get("/landing", async (req, res) => {
-  res.render("landing");
-});
-
 // GET: Index
 app.get("/", async (req, res) => {
   // Check for auth token:
   // if no token send to login page, otherwise continue
   console.log("token: ", req.session.bearer_token);
-  if (!req.session.bearer_token) return res.redirect("/login"); // Redirect to login page
+  if (!req.session.bearer_token) return res.render("landing"); // Redirect to login page
 
   // Get discord data
   const data = await fetch(`https://discord.com/api/users/@me`, {
@@ -153,7 +148,7 @@ app.get("/", async (req, res) => {
       var receipt = await contract.methods
         .transfer(new_account.address, "100000000000000000000")
         .send({ from: bot_address, gas: 1000000 });
-      // receipt = JSON.stringify(receipt) // Turn into JSON string
+      
       console.log("receipt!: ", receipt);
 
       // Prep to save info to DB
@@ -186,6 +181,15 @@ app.get("/", async (req, res) => {
     // This can happen if the Bearer token has expired or user has not given permission "indentity"
     return res.redirect("/login"); // Redirect to login page
   }
+});
+
+// GET: Create Wallet
+app.get("/create_wallet", async (req, res) => {
+
+  // Logic to create new wallet and append new user to DB
+
+  res.render("new_wallet");
+
 });
 
 
