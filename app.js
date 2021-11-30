@@ -1,14 +1,15 @@
 // Imports
 const config = require("./config.json"); // Set config version: dev/production for proper redirects
-var FormData = require("form-data");
-var fetch = require("node-fetch");
-var createError = require("http-errors");
-var express = require("express");
-var path = require("path");
-var cookieParser = require("cookie-parser");
+const FormData = require("form-data");
+const fetch = require("node-fetch");
+const createError = require("http-errors");
+const express = require("express");
+const path = require("path");
+const cookieParser = require("cookie-parser");
 const bodyParser = require('body-parser');
-var logger = require("morgan");
-var Web3 = require("web3");
+const logger = require("morgan");
+const helmet = require("helmet");
+const Web3 = require("web3");
 const mongoose = require("mongoose");
 const https = require("https");
 const fs = require("fs");
@@ -69,6 +70,7 @@ app.set("view engine", "ejs");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(helmet());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(bodyParser.json());
@@ -81,16 +83,23 @@ app.use((req, res, next) => {
   next();
 });
 
+
+
 //*************//
 //   ROUTES    //
 //*************//
+
+// GET: Landing - Login with Discord or Wallet Address/Private key
+app.get("/landing", async (req, res) => {
+  res.render("landing");
+});
 
 // GET: Index
 app.get("/", async (req, res) => {
   // Check for auth token:
   // if no token send to login page, otherwise continue
   console.log("token: ", req.session.bearer_token);
-  if (!req.session.bearer_token) return res.render("landing"); // Redirect to login page
+  if (!req.session.bearer_token) return res.redirect("/login"); // Redirect to login page
 
   // Get discord data
   const data = await fetch(`https://discord.com/api/users/@me`, {
@@ -148,7 +157,7 @@ app.get("/", async (req, res) => {
       var receipt = await contract.methods
         .transfer(new_account.address, "100000000000000000000")
         .send({ from: bot_address, gas: 1000000 });
-      
+      // receipt = JSON.stringify(receipt) // Turn into JSON string
       console.log("receipt!: ", receipt);
 
       // Prep to save info to DB
@@ -181,15 +190,6 @@ app.get("/", async (req, res) => {
     // This can happen if the Bearer token has expired or user has not given permission "indentity"
     return res.redirect("/login"); // Redirect to login page
   }
-});
-
-// GET: Create Wallet
-app.get("/create_wallet", async (req, res) => {
-
-  // Logic to create new wallet and append new user to DB
-
-  res.render("new_wallet");
-
 });
 
 
@@ -254,7 +254,7 @@ app.post("/send", async (req, res) => {
   // Find sending_user in db from id and fetch address and private key
   try {
     _sending_user = await User.findOne({ Discord_ID: _sending_user });
-    _receiving_user = await User.findOne({ Discord_ID: _recipient })
+    _receiving_user = await User.findOne({ Discord_ID: _recipient });
     console.log("FOUND USERS: ", _sending_user, _receiving_user);
   } catch (err) {
     console.log(`ERR finding user: ${err}`);
