@@ -1,29 +1,13 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>GOON Coin</title>
-    <link rel="stylesheet" href="/stylesheets/style.css" />
-    <link
-      rel="stylesheet"
-      type="text/css"
-      href="semantic-ui/semantic.min.css"
-    />
-    <script
-      src="https://code.jquery.com/jquery-3.1.1.min.js"
-      integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="
-      crossorigin="anonymous"
-    ></script>
-    <script src="semantic-ui/semantic.min.js"></script>
-    <script src="javascript/frontend.js"></script>
-    <link rel="shortcut icon" type="image/jpg" href="/images/favicon.ico" />
-  </head>
+<% layout('./layouts/boilerplate') %>
+
   <body>
     <!-- Navbar -->
-    <div class="ui stackable huge green inverted menu">
-      <a href="#" class="header item">
+    <div class="ui fixed stackable huge green inverted menu">
+      <a href="/" class="header item">
         <img
           class="ui avatar image"
-          src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=512"
+          alt="Discord avatar"
+          src="https://cdn.discordapp.com/avatars/<%=json.id%>/<%=json.avatar%>?size=64"
         />
         Welcome, <%=json.username%>#<%=json.discriminator%>!
       </a>
@@ -38,14 +22,14 @@
     </div>
 
     <!-- Body -->
-    <div class="ui centered stackable grid">
+    <div class="ui centered stackable grid" style="margin-top: 3rem;">
       
       <div class="four wide column">
         <!-- <div class="ui segment"></div> -->
       </div>
 
       <div class="eight wide column">
-        <h1>Send GOON To</h1>
+        <h1>Send GOON</h1>
         <div class="ui segment">
           <form class="ui large form" action="https://gooncoin.maxlareau.com/send" method="POST">
 
@@ -68,10 +52,11 @@
                     <% if (u.Avatar) { %>
                     <img
                       class="ui avatar image"
-                      src="https://cdn.discordapp.com/avatars/<%=u.Discord_ID%>/<%=u.Avatar%>?size=512"
+                      alt="Discord avatar"
+                      src="https://cdn.discordapp.com/avatars/<%=u.Discord_ID%>/<%=u.Avatar%>?size=64"
                     />
                     <% } else { %>
-                    <img class="ui avatar image" src="images/user64px.png"/>
+                    <img alt="Discord avatar" class="ui avatar image" src="images/user64px.png"/>
                     <% } %>
                     <span><%= u.Username %>#<%= u.Discriminator %></span>
                   </div>

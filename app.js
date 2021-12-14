@@ -6,7 +6,8 @@ const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
+const engine = require("ejs-mate");
 const logger = require("morgan");
 const helmet = require("helmet");
 const Web3 = require("web3");
@@ -21,7 +22,7 @@ var web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545"); // Web3.g
 mongoose.connect("mongodb://localhost/GoonCoin", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-}); // Connect DB
+}); // Connect DB //
 const abi = require("./abi.json");
 const address = "0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a";
 const bot_address = "0x59fd0131484833435939CFA678A70A018eD03a23";
@@ -49,7 +50,7 @@ db.once("open", function () {
   console.log("DB Connected!");
 });
 
-// Define DB schema
+// Define DB schemas
 const userSchema = new mongoose.Schema({
   Discord_ID: String,
   Name: String,
@@ -63,6 +64,7 @@ const userSchema = new mongoose.Schema({
 const User = mongoose.model("User", userSchema);
 
 // view engine setup
+app.engine("ejs", engine);
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "ejs");
 
@@ -70,9 +72,19 @@ app.set("view engine", "ejs");
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(helmet());
+app.use(
+  helmet.contentSecurityPolicy({
+    useDefaults: true,
+    directives: {
+      "default-src": ["'self'","gooncoin.maxlareau.com","*.discord.com","cdn.discordapp.com","*.binance.org"],
+      "img-src": ["'self'","*.discord.com","cdn.discordapp.com"]
+    },
+  })
+);
+
+
 app.use(cookieParser());
-app.use(bodyParser.urlencoded({extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(require("express-session")(config.session));
@@ -82,8 +94,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-
-
 
 //*************//
 //   ROUTES    //
@@ -99,7 +109,7 @@ app.get("/", async (req, res) => {
   // Check for auth token:
   // if no token send to login page, otherwise continue
   console.log("token: ", req.session.bearer_token);
-  if (!req.session.bearer_token) return res.redirect("/login"); // Redirect to login page
+  if (!req.session.bearer_token) return res.render("landing"); // Redirect to login page
 
   // Get discord data
   const data = await fetch(`https://discord.com/api/users/@me`, {
@@ -121,7 +131,7 @@ app.get("/", async (req, res) => {
       var _balanceOfWallet;
 
       console.log("ADDRESS: ", _user.Address);
-      
+
       try {
         _balanceOfWallet = await contract.methods
           .balanceOf(_user.Address)
@@ -186,12 +196,12 @@ app.get("/", async (req, res) => {
     console.log(err);
   }
 
+  // Redirect to login page
+  // This can happen if the Bearer token has expired or user has not given permission "indentity"
   if (!json.username) {
-    // This can happen if the Bearer token has expired or user has not given permission "indentity"
-    return res.redirect("/login"); // Redirect to login page
+    return res.redirect("/landing");
   }
 });
-
 
 // GET: Wallet
 app.get("/wallet", async (req, res) => {
@@ -236,7 +246,6 @@ app.get("/wallet", async (req, res) => {
   }
 });
 
-
 // GET: Send
 app.post("/send", async (req, res) => {
   // req.body - fetch query parameters from submitted form: address, amount, and sending_user (hidden)
@@ -249,7 +258,9 @@ app.post("/send", async (req, res) => {
   var _sending_user = req.body.sending_user;
   var _amount = req.body.amount;
 
-  console.log(`recip: ${_recipient}\nsending user: ${_sending_user}\namount: ${_amount}`);
+  console.log(
+    `recip: ${_recipient}\nsending user: ${_sending_user}\namount: ${_amount}`
+  );
 
   // Find sending_user in db from id and fetch address and private key
   try {
@@ -261,7 +272,9 @@ app.post("/send", async (req, res) => {
   }
 
   // Add account to wallet
-  var new_account = await web3.eth.accounts.privateKeyToAccount(_sending_user.Key);
+  var new_account = await web3.eth.accounts.privateKeyToAccount(
+    _sending_user.Key
+  );
   wallet.add(new_account);
   console.log(`new account created: ${new_account}`);
 
@@ -270,16 +283,14 @@ app.post("/send", async (req, res) => {
     .transfer(_receiving_user.Address, amountToEther(_amount))
     .send({ from: _sending_user.Address, gas: 1000000 });
 
-  console.log(receipt)
+  console.log(receipt);
 
   // If successful, redirect to success page with receipt summarized receipt params
   // Otherwise, redirect to home and log error (later: show error banner)
   res.redirect("/");
 
   // Make a transaction
-
 });
-
 
 // GET: Callback
 app.get("/login/callback", async (req, res) => {
@@ -344,8 +355,7 @@ app.get("/logout", (req, res) => {
 // Convert simple amount to 18 decimal string
 function amountToEther(amount) {
   return Web3.utils.toWei(amount, "ether");
-};
-
+}
 
 // SERVER
 server.listen(_port, () => {
