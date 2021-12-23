@@ -7,6 +7,9 @@ body > .grid {
   #landing-header {
     background-color: white;
   }
+  #landing-header-row {
+    margin-bottom: 40px;
+  }
   #login_card {
     background-color: #21BA45;
   }

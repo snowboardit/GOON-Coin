@@ -1,8 +1,14 @@
 // Imports
 const config = require("./config.json"); // Set config version: dev/production for proper redirects
+const {
+  amountToEther,
+  discordIdExists,
+  getBalanceOfAddress,
+} = require("./utils.js");
+const { User } = require("./model/user.js");
+const { getDiscordUserData } = require("./discord.js");
 const FormData = require("form-data");
 const fetch = require("node-fetch");
-const createError = require("http-errors");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
@@ -15,8 +21,8 @@ const mongoose = require("mongoose");
 const https = require("https");
 const fs = require("fs");
 
-// Variables
-const _port = 8443;
+// Variables/constants
+const PORT = 8443;
 var app = express();
 var web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545"); // Web3.givenProvider || binance smart chain testnet url
 mongoose.connect("mongodb://localhost/GoonCoin", {
@@ -50,19 +56,6 @@ db.once("open", function () {
   console.log("DB Connected!");
 });
 
-// Define DB schemas
-const userSchema = new mongoose.Schema({
-  Discord_ID: String,
-  Name: String,
-  Username: String,
-  Discriminator: String,
-  Avatar: String,
-  Address: String,
-  Key: String,
-});
-
-const User = mongoose.model("User", userSchema);
-
 // view engine setup
 app.engine("ejs", engine);
 app.set("views", path.join(__dirname, "views"));
@@ -76,12 +69,17 @@ app.use(
   helmet.contentSecurityPolicy({
     useDefaults: true,
     directives: {
-      "default-src": ["'self'","gooncoin.maxlareau.com","*.discord.com","cdn.discordapp.com","*.binance.org"],
-      "img-src": ["'self'","*.discord.com","cdn.discordapp.com"]
+      "default-src": [
+        "'self'",
+        "gooncoin.maxlareau.com",
+        "*.discord.com",
+        "cdn.discordapp.com",
+        "*.binance.org",
+      ],
+      "img-src": ["'self'", "*.discord.com", "cdn.discordapp.com"],
     },
   })
 );
-
 
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -112,41 +110,21 @@ app.get("/", async (req, res) => {
   if (!req.session.bearer_token) return res.render("landing"); // Redirect to login page
 
   // Get discord data
-  const data = await fetch(`https://discord.com/api/users/@me`, {
-    headers: { Authorization: `Bearer ${req.session.bearer_token}` },
-  }); // Fetching user data
-  const json = await data.json();
-  console.log("json: ", json);
+  const { id } = await getDiscordUserData(req.session.bearer_token);
 
   // Check for new user in DB
   // if id is new, render the new wallet page
   // if id isn't new, render the home page
   try {
-    _found_user = await User.exists({ Discord_ID: json.id });
-    console.log("FOUND USER: ", _found_user);
-    if (_found_user) {
-      // -- USER IN DB, GET BALANCE, RENDER HOME --
-      const _user = await User.findOne({ Discord_ID: json.id });
-      const _user_list = await User.find({});
-      var _balanceOfWallet;
+    let found_user = discordIdExists(id);
 
-      console.log("ADDRESS: ", _user.Address);
-
-      try {
-        _balanceOfWallet = await contract.methods
-          .balanceOf(_user.Address)
-          .call();
-        _balanceOfWallet = Web3.utils.fromWei(_balanceOfWallet, "ether");
-      } catch (err) {
-        console.log(err);
-        _balanceOfWallet = 0;
-      }
-
+    if (found_user) {
+      balanceOfWallet = getBalanceOfAddress(id);
       // IF existing user, render the home page
       // Check if user avatar is null first
       res.render("index", {
         json: json,
-        balanceOfWallet: _balanceOfWallet,
+        balanceOfWallet: balanceOfWallet,
         address: _user.Address,
         user_list: _user_list,
         contract_address: address,
@@ -216,10 +194,12 @@ app.get("/wallet", async (req, res) => {
   // if id is new, render the new wallet page
   // if id isn't new, render the home page
   try {
-    _found_user = await User.exists({ Discord_ID: json.id });
-    console.log("FOUND USER: ", _found_user);
-    if (_found_user) {
-      // -- USER IN DB, GET BALANCE, RENDER HOME --
+    let found_user = discordIdExists(json.id);
+
+    if (found_user) {
+      // -- USER IN DB, GET BALANCE, RENDER HOME -- //
+
+      // TODO - Create external @getBalanceOfAddress() function
       const _user = await User.findOne({ Discord_ID: json.id });
       console.log("ADDRESS: ", _user.Address);
       var _balanceOfWallet;
@@ -232,6 +212,7 @@ app.get("/wallet", async (req, res) => {
         console.log(err);
         _balanceOfWallet = 0;
       }
+
       // IF existing user, render the home page
       res.render("wallet", {
         json: json,
@@ -288,8 +269,6 @@ app.post("/send", async (req, res) => {
   // If successful, redirect to success page with receipt summarized receipt params
   // Otherwise, redirect to home and log error (later: show error banner)
   res.redirect("/");
-
-  // Make a transaction
 });
 
 // GET: Callback
@@ -351,13 +330,7 @@ app.get("/logout", (req, res) => {
   res.redirect("/");
 });
 
-// Funcs //
-// Convert simple amount to 18 decimal string
-function amountToEther(amount) {
-  return Web3.utils.toWei(amount, "ether");
-}
-
 // SERVER
-server.listen(_port, () => {
-  console.log(`Express started on port ${_port}`);
+server.listen(PORT, () => {
+  console.log(`Express started on port ${PORT}`);
 });

@@ -1,0 +1,3 @@
+function getBalanceOfAddress() {
+    return balance
+}
