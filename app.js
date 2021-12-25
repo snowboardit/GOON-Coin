@@ -8,7 +8,8 @@ const {
   getUserDiscordData,
   userExists,
   getUserById,
-  getAllUsers
+  getAllUsers,
+  getBearerToken
 } = require("./discord.js");
 const FormData = require("form-data");
 const fetch = require("node-fetch");
