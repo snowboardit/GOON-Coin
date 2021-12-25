@@ -1,3 +1,0 @@
-function getBalanceOfAddress() {
-    return balance
-}

@@ -1,12 +1,15 @@
 // Imports
 const config = require("./config.json"); // Set config version: dev/production for proper redirects
-const {
-  amountToEther,
-  discordIdExists,
-  getBalanceOfAddress,
-} = require("./utils.js");
+const abi = require("./abi.json");
+const { amountToEther } = require("./utils.js");
+const { getBalanceOfAddress, sendGoonCoin } = require("./gooncoin.js");
 const { User } = require("./model/user.js");
-const { getDiscordUserData } = require("./discord.js");
+const {
+  getUserDiscordData,
+  userExists,
+  getUserById,
+  getAllUsers
+} = require("./discord.js");
 const FormData = require("form-data");
 const fetch = require("node-fetch");
 const express = require("express");
@@ -29,11 +32,10 @@ mongoose.connect("mongodb://localhost/GoonCoin", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 }); // Connect DB //
-const abi = require("./abi.json");
-const address = "0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a";
+const contract_address = "0xFA6adB9276bD42653f4A3AE445BDdB8Dc50Af18a";
 const bot_address = "0x59fd0131484833435939CFA678A70A018eD03a23";
 var wallet = web3.eth.accounts.wallet.create();
-var contract = new web3.eth.Contract(abi, address);
+var contract = new web3.eth.Contract(abi, contract_address);
 const server_options = {
   key: fs.readFileSync(__dirname + "/certificate/gooncoin.maxlareau.com.key"),
   ca: fs.readFileSync(
@@ -47,7 +49,6 @@ var server = https.createServer(server_options, app);
 wallet.add(
   "0x6e2677c0453e9eb9bde57420dba54fa8228b220bb74a3fb3b386b3cd8cbb37ef"
 );
-// TODO: LOAD OTHER ACCOUNTS INTO LOCAL WALLET FROM DB FOR EACH USER ACCOUNT
 
 // DB Setup
 const db = mongoose.connection;
@@ -102,7 +103,11 @@ app.get("/landing", async (req, res) => {
   res.render("landing");
 });
 
-// GET: Index
+
+/** 
+ * Show the home page/send interface
+ * @route GET /
+ */
 app.get("/", async (req, res) => {
   // Check for auth token:
   // if no token send to login page, otherwise continue
@@ -110,31 +115,44 @@ app.get("/", async (req, res) => {
   if (!req.session.bearer_token) return res.render("landing"); // Redirect to login page
 
   // Get discord data
-  const { id } = await getDiscordUserData(req.session.bearer_token);
+  const json = await getUserDiscordData(req.session.bearer_token);
 
   // Check for new user in DB
   // if id is new, render the new wallet page
   // if id isn't new, render the home page
   try {
-    let found_user = discordIdExists(id);
+    let found_user = userExists(json.id);
 
     if (found_user) {
-      balanceOfWallet = getBalanceOfAddress(id);
-      // IF existing user, render the home page
-      // Check if user avatar is null first
-      res.render("index", {
-        json: json,
-        balanceOfWallet: balanceOfWallet,
-        address: _user.Address,
-        user_list: _user_list,
-        contract_address: address,
+
+      /**
+       * - Get current user info from DB
+       * - Get all users from DB
+       * - Get current user's balance
+       * - Render home page with provided data
+       */
+      const user = await getUserById(json.id);
+      const user_list = await getAllUsers();
+      const balanceOfWallet = getBalanceOfAddress(json.id, contract);
+
+      balanceOfWallet.then(balance => {
+        res.render("index", {
+          json: json,
+          balanceOfWallet: balance,
+          address: user.Address,
+          user_list: user_list,
+          contract_address: contract_address,
+        })
+      }).catch(err => {
+        console.log(err);
       });
+
     } else {
       // -- USER NOT IN DB, LOG USER IN DB, GIVE 100 GOON, RENDER NEW WALLET PAGE --
       console.log("user not in DB");
 
       // Create new account - public/private key pair
-      var new_account = web3.eth.accounts.create();
+      let new_account = web3.eth.accounts.create();
       console.log("new account", new_account);
 
       // load account into wallet
@@ -142,10 +160,14 @@ app.get("/", async (req, res) => {
       console.log("new account added: ", new_account);
 
       // Give new account 100 GOON from dev wallet
-      var receipt = await contract.methods
-        .transfer(new_account.address, "100000000000000000000")
-        .send({ from: bot_address, gas: 1000000 });
+      // TODO: This may have issues - need to test
+      const receipt = await sendGoonCoin(new_account.address, "100", bot_address);
+
+      // var receipt = await contract.methods
+      //   .transfer(new_account.address, "100000000000000000000")
+      //   .send({ from: bot_address, gas: 1000000 });
       // receipt = JSON.stringify(receipt) // Turn into JSON string
+
       console.log("receipt!: ", receipt);
 
       // Prep to save info to DB
@@ -181,44 +203,32 @@ app.get("/", async (req, res) => {
   }
 });
 
-// GET: Wallet
+
 app.get("/wallet", async (req, res) => {
+
+  // TODO: REFACTOR THIS ROUTE NEXT
+
   // Get discord data
-  const data = await fetch(`https://discord.com/api/users/@me`, {
-    headers: { Authorization: `Bearer ${req.session.bearer_token}` },
-  }); // Fetching user data
-  const json = await data.json();
-  console.log("json: ", json);
+  const data = await getUserDiscordData(req.session.bearer_token);
 
   // Check for new user in DB
   // if id is new, render the new wallet page
   // if id isn't new, render the home page
   try {
-    let found_user = discordIdExists(json.id);
+    let found_user = getUserById(data.id);
 
     if (found_user) {
       // -- USER IN DB, GET BALANCE, RENDER HOME -- //
 
-      // TODO - Create external @getBalanceOfAddress() function
-      const _user = await User.findOne({ Discord_ID: json.id });
-      console.log("ADDRESS: ", _user.Address);
-      var _balanceOfWallet;
-      try {
-        _balanceOfWallet = await contract.methods
-          .balanceOf(_user.Address)
-          .call();
-        _balanceOfWallet = Web3.utils.fromWei(_balanceOfWallet, "ether");
-      } catch (err) {
-        console.log(err);
-        _balanceOfWallet = 0;
-      }
+      const user = await User.findOne({ Discord_ID: data.id });
+      const balanceOfWallet = getBalanceOfAddress(user.Address, contract);
 
       // IF existing user, render the home page
       res.render("wallet", {
-        json: json,
-        balanceOfWallet: _balanceOfWallet,
-        user: _user,
-        contract_address: address,
+        json: data,
+        balanceOfWallet: balanceOfWallet,
+        user: user,
+        contract_address: contract_address,
       });
     }
   } catch (err) {
@@ -273,28 +283,15 @@ app.post("/send", async (req, res) => {
 
 // GET: Callback
 app.get("/login/callback", async (req, res) => {
-  console.log("Callback");
+
+  // Get acces code from query params
   const accessCode = req.query.code;
+
+  // Check if something went wrong and access code wasn't given
   if (!accessCode)
-    // If something went wrong and access code wasn't given
     return res.send("No access code specified");
 
-  // Creating form to make request
-  const data = new FormData();
-  data.append("client_id", config.oauth2.client_id);
-  data.append("client_secret", config.oauth2.secret);
-  data.append("grant_type", "authorization_code");
-  data.append("redirect_uri", config.oauth2.redirect_uri);
-  data.append("scope", "identify");
-  data.append("code", accessCode);
-
-  // Making request to oauth2/token to get the Bearer token
-  const json = await (
-    await fetch("https://discord.com/api/oauth2/token", {
-      method: "POST",
-      body: data,
-    })
-  ).json();
+  const json = await getBearerToken(config, accessCode);
   req.session.bearer_token = json.access_token;
 
   res.redirect("/"); // Redirecting to main page
@@ -312,11 +309,11 @@ app.get("/login", (req, res) => {
   );
   res.redirect(
     `https://discord.com/api/oauth2/authorize` +
-      `?client_id=${config.oauth2.client_id}` +
-      `&redirect_uri=${encodeURIComponent(config.oauth2.redirect_uri)}` +
-      `&response_type=code&scope=${encodeURIComponent(
-        config.oauth2.scopes.join(" ")
-      )}`
+    `?client_id=${config.oauth2.client_id}` +
+    `&redirect_uri=${encodeURIComponent(config.oauth2.redirect_uri)}` +
+    `&response_type=code&scope=${encodeURIComponent(
+      config.oauth2.scopes.join(" ")
+    )}`
   );
 });
 
