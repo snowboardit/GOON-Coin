@@ -26,7 +26,6 @@ const https = require("https");
 const fs = require("fs");
 
 // Variables/constants
-const PORT = 8443;
 var app = express();
 var web3 = new Web3("https://data-seed-prebsc-1-s1.binance.org:8545"); // Web3.givenProvider || binance smart chain testnet url
 mongoose.connect("mongodb://localhost/GoonCoin", {
@@ -329,6 +328,6 @@ app.get("/logout", (req, res) => {
 });
 
 // SERVER
-server.listen(PORT, () => {
-  console.log(`Express started on port ${PORT}`);
+server.listen(process.env.PORT, () => {
+  console.log(`Express started on port ${process.env.PORT}`);
 });
