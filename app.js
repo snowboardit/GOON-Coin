@@ -11,8 +11,6 @@ const {
   getAllUsers,
   getBearerToken
 } = require("./discord.js");
-const FormData = require("form-data");
-const fetch = require("node-fetch");
 const express = require("express");
 const path = require("path");
 const cookieParser = require("cookie-parser");
