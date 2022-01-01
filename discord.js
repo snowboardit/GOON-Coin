@@ -1,3 +1,4 @@
+const FormData = require("form-data");
 const fetch = require("node-fetch");
 const User = require("./model/user.js");
 

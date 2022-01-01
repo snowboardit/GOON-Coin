@@ -213,13 +213,14 @@ app.get("/wallet", async (req, res) => {
   // if id is new, render the new wallet page
   // if id isn't new, render the home page
   try {
+
     let found_user = getUserById(data.id);
 
     if (found_user) {
       // -- USER IN DB, GET BALANCE, RENDER HOME -- //
 
-      const user = await User.findOne({ Discord_ID: data.id });
-      const balanceOfWallet = getBalanceOfAddress(user.Address, contract);
+      const user = await getUserById(data.id)
+      const balanceOfWallet = await getBalanceOfAddress(data.id, contract);
 
       // IF existing user, render the home page
       res.render("wallet", {
@@ -230,7 +231,7 @@ app.get("/wallet", async (req, res) => {
       });
     }
   } catch (err) {
-    console.log(`Error: ${err}`);
+    console.log(`Error - /wallet: ${err}`);
     res.redirect("/");
   }
 });
