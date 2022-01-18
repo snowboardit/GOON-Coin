@@ -1,19 +1,23 @@
-body > .grid {
-    height: 100%;
-  }
-  .column {
-    max-width: 450px;
-  }
-  #landing-header {
-    background-color: white;
-  }
-  #landing-header-row {
-    margin-bottom: 40px;
-  }
-  #login_card {
-    background-color: #21BA45;
-  }
-  #login_button {
-    margin-top: 1.5em;
-    margin-bottom: 1.15em;
-  }
+body {
+  background: linear-gradient(133deg, rgba(48, 9, 42, 1) 0%, rgba(203, 60, 97, 1) 100%);
+}
+
+body>.grid {
+  height: 100%;
+}
+
+.column {
+  max-width: 30%;
+}
+
+.row {
+  padding: 2px;
+}
+
+.image {
+  margin: 20px auto 40px;
+}
+
+.ui.segment {
+  background-color: rgba(170, 170, 170, .05);
+}

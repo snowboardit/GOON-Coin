@@ -1,32 +1,47 @@
 <% layout('layouts/boilerplate') %>
 
   <body>
-    <div style="background-image: url(images/login_bg.jpg); size: auto auto;"></div>
-    <!-- Login Card -->
-    <div class="ui middle aligned center aligned grid container">
 
-      <div class="four wide column"></div>
+    <main class="ui middle aligned center aligned grid">
 
-      <div id="login_card" class="green six wide 2 segment column" style="padding: 4rem;">
-        <div class="landing-header-row row">
-          <h1 id="landing_header" class="ui image header">
-            <img class="ui centered tiny image" src='images/GOONCoin-192x192.png' alt="coin">
-            GOON Coin
-          </h1>
+      <div class="column">
+
+        <!-- Main Content -->
+        <div class="ui padded raised segment">
+
+          <!-- Logo -->
+          <div class="row">
+            <img class="ui centered medium image" src='default-monochrome.svg' alt="logo">
+          </div>
+
+          <!-- Selection Container -->
+          <div class="row">
+
+            <!-- Signup With Discord -->
+            <div class="row">
+              <a href="/login" class="fluid ui primary large button">
+                <i class="icon discord"></i> Login with Discord</a>
+            </div>
+
+            <!-- Divider -->
+            <div class="ui divider"></div>
+
+            <!-- Create new and Login with Wallet -->
+            <div class="row fluid ui buttons">
+              <a href="/" class="ui gray large button">Create New Wallet</a>
+              <div class="or"></div>
+              <a href="/" class="ui gray large button">Login with Wallet</a>
+            </div>
+
+          </div>
+
+
         </div>
-        
-        <div class="row">
-          <a href="/login" id="login_button" class="fluid ui blue button">Login/Sign up with Discord</a>
-        </div>
-        <div class="ui divider"></div>
-        <div class="row">
-          <a href="/" class="ui gray button">Create new Wallet</a>
-          <a href="/" class="ui gray button">Login with Wallet</a>
-        </div>
+
       </div>
 
-      <div class="four wide column"></div>
+    </main>
 
-    </div>
   </body>
-</html>
+
+  </html>
