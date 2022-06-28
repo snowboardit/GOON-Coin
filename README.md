@@ -4,6 +4,7 @@ A Binance Smart Chain (BEP-20) token accompanied by a full-stack web application
 ## 🗃️ Stack
 - ⚛️ **Node & Express:** Foundation for web server
 - 🗃 **MonogoDB:** Non-relational database primarily used for storing user data
+- 🔒 **OAuth 2.0** Login using your Discord account
 - 🕸  **Web3.js:** Calls to the blockchain to query smart contract state, user balance, etc...
 - 💬 **Discord.js:** Backend for Discord bot
 - 💨 **Semantic UI**
